@@ -14,8 +14,12 @@ const serverList = (options) => {
   const next = (pageNo >= totalPage ? (totalCount % pageSize) : pageSize) + 1
   var Random = Mock.Random
   var statusArray = [
-    'active',
-    'inactive'
+    'enabled',
+    'disabled'
+  ]
+  var profileArray = [
+    'admin',
+    'user'
   ]
 
   for (let i = 1; i < next; i++) {
@@ -24,7 +28,10 @@ const serverList = (options) => {
       key: tmpKey,
       id: tmpKey,
       name: Random.name(),
-      age: Random.integer(10, 100),
+      lastname: Random.last(),
+      login: Random.email(),
+      password: Random.zip(),
+      profile: profileArray[Random.integer(0, 1)],
       status: statusArray[Random.integer(0, 1)],
       updatedAt: Mock.mock('@datetime'),
       editable: false

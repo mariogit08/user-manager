@@ -51,7 +51,7 @@ import pick from 'lodash.pick'
 import AvatarModal from './AvatarModal'
 
 // 表单字段
-const extraFormFields = ['avatar']
+const formFields = ["id", "name","lastname","login","password","profile", 'avatar']
 
 export default {
   components: { 'avatar-modal': AvatarModal },
@@ -92,12 +92,12 @@ export default {
     console.log('custom modal created')   
 
     // Registering extra form fields. Fields that isn't as a field decorator
-    extraFormFields.forEach(v => this.form.getFieldDecorator(v))    
+    formFields.forEach(v => this.form.getFieldDecorator(v))    
     
-    // Model - Setting values when the form change
+    // Model - Setting values when the model change
     this.$watch('model', () => {
       console.log("model",this.model)
-      this.model && this.form.setFieldsValue(pick(this.model, extraFormFields))
+      this.model && this.form.setFieldsValue(pick(this.model, formFields))
     })    
   },
   methods: {

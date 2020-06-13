@@ -6,14 +6,14 @@
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
               <a-form-item label="User name">
-                <a-input v-model="queryParam.id" placeholder=""/>
+                <a-input v-model="queryParam.name" placeholder=""/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="Status">
-                <a-select v-model="queryParam.status" placeholder="Status" default-value="ativo">
-                  <a-select-option value="active">Active</a-select-option>
-                  <a-select-option value="inactive">Inactive</a-select-option>
+                <a-select v-model="queryParam.status" placeholder="Status" default-value="enabled">
+                  <a-select-option value="enabled">Enabled</a-select-option>
+                  <a-select-option value="disabled">Disabled</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -29,7 +29,10 @@
 
       <div class="table-operator">
         <a-button type="primary" icon="plus" @click="handleAdd">Add</a-button>
+        <a-button :disabled="selectedRowKeys.length != 1" type="primary" icon="plus"  @click="handleEdit">Edit</a-button>
       </div>
+
+     
 
       <s-table
         ref="table"
@@ -40,22 +43,17 @@
         :alert="false"
         :rowSelection="rowSelection"
         showPagination="auto"
-      >
-        <span slot="serial" slot-scope="text, record, index">
-          {{ index + 1 }}
-        </span>
+      >        
         <span slot="status" slot-scope="text">
-          <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
+          <a-badge v-if="text=='disabled'" status="default" :text="text" />
+          <a-badge v-else status="success" :text="text" />
         </span>
-        <span slot="description" slot-scope="text">
-          <ellipsis :length="4" tooltip>{{ text }}</ellipsis>
-        </span>
-
         <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleEdit(record)">配置</a>
+            <a @click="handleEdit(record)">Edit</a>
             <a-divider type="vertical" />
-            <a @click="handleSub(record)">订阅报警</a>
+            <a v-if="record.status == 'enabled'" @click="handleEnableDisable(record)">Disable</a>
+            <a v-else @click="handleEnableDisable(record)">Enable</a>                        
           </template>
         </span>
       </s-table>
@@ -90,22 +88,35 @@ const columns = [
     title: 'Name',
     dataIndex: 'name'
     // scopedSlots: { customRender: 'description' }
+  }, 
+  {
+    title: 'Last Name',
+    dataIndex: 'lastname'
+  }, 
+  {
+    title: 'Login',
+    dataIndex: 'login'
   },
   {
-    title: 'Age',
-    dataIndex: 'age',
-    sorter: true,
-    needTotal: true,
-    customRender: (text) => text + ' years'
-  },
-  {
-    title: 'Status',
-    dataIndex: 'status'
+    title: 'Profile',
+    dataIndex: 'profile'
   },
   {
     title: 'Updated At',
     dataIndex: 'updatedAt',
     sorter: true
+  },
+  {
+    title: 'Status',
+    dataIndex: 'status',
+    sorter: true,
+    scopedSlots: { customRender: 'status' }
+  },
+  {
+    title: 'Action',
+    dataIndex: 'action',
+    width: '150px',
+    scopedSlots: { customRender: 'action' }
   }
 ]
 
@@ -150,6 +161,7 @@ export default {
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
         const requestParameters = Object.assign({}, parameter, this.queryParam)
+        console.log('queryParam:', this.queryParam)
         console.log('loadData request parameters:', requestParameters)
         console.log('parameter:', parameter)
         return getServiceList(requestParameters)
@@ -237,13 +249,15 @@ export default {
       this.visible = false
 
       const form = this.$refs.createModal.form
-      form.resetFields() // 清理表单数据（可不做）
+      form.resetFields()
     },
-    handleSub (record) {
-      if (record.status !== 0) {
-        this.$message.info(`${record.no} 订阅成功`)
+    handleEnableDisable (record) {
+      if (record.status === 'enabled' ) {
+        record.status = 'disabled'
+        this.$message.success(`${record.name} User disabled`)
       } else {
-        this.$message.error(`${record.no} 订阅失败，规则已关闭`)
+        record.status = 'enabled'
+        this.$message.success(`${record.name} User enabled`)
       }
     },
     onSelectChange (selectedRowKeys, selectedRows) {
