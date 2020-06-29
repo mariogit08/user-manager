@@ -201,7 +201,7 @@ export default {
       this.visible = true
       this.mdl = { ...record }
     },
-    handleOk () {
+    handleOk (record) {
       const form = this.$refs.createModal.form
       this.confirmLoading = true
       form.validateFields((errors, values) => {
@@ -216,10 +216,10 @@ export default {
             }).then(res => {
               this.visible = false
               this.confirmLoading = false
-              // 重置表单数据
-              form.resetFields()
-              // 刷新表格
-              this.$refs.table.refresh()
+              // // 重置表单数据
+              // form.resetFields()
+              // // 刷新表格
+              // this.$refs.table.refresh()
 
               this.$message.info('Successfully update')
             })

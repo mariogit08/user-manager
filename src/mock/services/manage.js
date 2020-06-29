@@ -1,52 +1,77 @@
 import Mock from 'mockjs2'
 import { builder, getQueryParameters } from '../util'
-
+import _ from 'lodash'
 const totalCount = 5701
-
-const serverList = (options) => {
-  const parameters = getQueryParameters(options)
-
-  const result = []
-  const pageNo = parseInt(parameters.pageNo)
+var users = []
+const metaData = (parameters,list) => {
   const pageSize = parseInt(parameters.pageSize)
-  const totalPage = Math.ceil(totalCount / pageSize)
-  const key = (pageNo - 1) * pageSize
-  const next = (pageNo >= totalPage ? (totalCount % pageSize) : pageSize) + 1
-  var Random = Mock.Random
-  var statusArray = [
-    'enabled',
-    'disabled'
-  ]
-  var profileArray = [
-    'admin',
-    'user'
-  ]
-
-  for (let i = 1; i < next; i++) {
-    const tmpKey = key + i
-    result.push({
-      key: tmpKey,
-      id: tmpKey,
-      name: Random.name(),
-      lastname: Random.last(),
-      login: Random.email(),
-      password: Random.zip(),
-      profile: profileArray[Random.integer(0, 1)],
-      status: statusArray[Random.integer(0, 1)],
-      updatedAt: Mock.mock('@datetime'),
-      editable: false
-    })
-  }
-
-  return builder({
+  return {
+    pageNo: parseInt(parameters.pageNo),    
     pageSize: pageSize,
-    pageNo: pageNo,
-    totalCount: totalCount,
-    totalPage: totalPage,
-    data: result
-  })
+    totalPage: Math.ceil(list.length / pageSize),
+    // key = (pageNo - 1) * pageSize,
+    // next = (pageNo >= totalPage ? (totalCount % pageSize) : pageSize) + 1
+  }
+   
 }
+const serverList = (options) => {
+    const parameters = getQueryParameters(options)  
+    console.log(parameters)
 
+    let result = []
+    if(users.length > 1){
+      result = users;
+      var nameFilter = (item) => { return item.name.indexOf(parameters.name)>-1 }
+      var statusFilter = (item) => { return item.status.indexOf(parameters.status)>-1 }      
+      result = parameters.name ? _.filter(result, nameFilter) : users      
+      result = parameters.status ? _.filter(result, statusFilter) : users           
+
+      var meta = metaData(parameters, users)
+
+      return builder({
+        pageSize: meta.pageSize,
+        pageNo: meta.pageNo,
+        totalPage: meta.totalPage,
+        totalCount: result.length,        
+        data: result
+        })
+      }
+
+    var Random = Mock.Random
+    var statusArray = [
+      'enabled',
+      'disabled'
+    ]
+    var profileArray = [
+      'admin',
+      'user'
+    ]
+
+    
+    
+    for (let i = 1; i < 1000; i++) {
+      users.push({
+        key: i,
+        id: i,
+        name: Random.name(),
+        lastname: Random.last(),
+        login: Random.email(),
+        password: Random.zip(),
+        profile: profileArray[Random.integer(0, 1)],
+        status: statusArray[Random.integer(0, 1)],
+        updatedAt: Mock.mock('@datetime'),
+        editable: false
+      })
+    }
+    var meta = metaData(parameters, users)
+    return builder({
+      pageSize: meta.pageSize,
+      pageNo: meta.pageNo,
+      totalCount: users.length,
+      totalPage: meta.totalPage,
+      data: users
+      })
+  }  
 const projects = () => {
   return builder({
     'data': [{
