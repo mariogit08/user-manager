@@ -27,7 +27,7 @@
             ]" />
         </a-form-item>
         <a-form-item
-          label="目标描述"
+          label="aaaaaaaaaaaaaaaaaaaaa"
           :labelCol="{lg: {span: 7}, sm: {span: 7}}"
           :wrapperCol="{lg: {span: 10}, sm: {span: 17} }">
           <a-textarea
