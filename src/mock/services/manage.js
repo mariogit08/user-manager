@@ -23,8 +23,9 @@ const serverList = (options) => {
       result = users;
       var nameFilter = (item) => { return item.name.indexOf(parameters.name)>-1 }
       var statusFilter = (item) => { return item.status.indexOf(parameters.status)>-1 }      
-      result = parameters.name ? _.filter(result, nameFilter) : users      
-      result = parameters.status ? _.filter(result, statusFilter) : users           
+      result = parameters.name ? _.filter(result, nameFilter) : users            
+      result = parameters.status ? _.filter(result, statusFilter) : result     
+      
 
       var meta = metaData(parameters, users)
 
